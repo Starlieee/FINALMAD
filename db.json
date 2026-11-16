@@ -1,0 +1,61 @@
+{
+  "users": [
+    {
+      "id": "u-1001",
+      "name": "Nadia Putri",
+      "email": "user@kampus.id",
+      "password": "user123",
+      "role": "user",
+      "studentId": "2401001"
+    },
+    {
+      "id": "s-2001",
+      "name": "Bima Pratama",
+      "email": "petugas@kampus.id",
+      "password": "staff123",
+      "role": "petugas",
+      "assignedCounter": "Loket Akademik"
+    },
+    {
+      "id": "a-3001",
+      "name": "Admin Kampus",
+      "email": "admin@kampus.id",
+      "password": "admin123",
+      "role": "admin"
+    }
+  ],
+  "events": [
+    {
+      "id": "akademik",
+      "name": "Layanan Akademik",
+      "description": "Surat aktif kuliah, legalisir, dan konsultasi akademik.",
+      "prefix": "A",
+      "dailyQuota": 40,
+      "status": "open",
+      "counterName": "Loket Akademik",
+      "openHours": "08.00 - 15.00"
+    },
+    {
+      "id": "keuangan",
+      "name": "Administrasi Keuangan",
+      "description": "Informasi pembayaran dan administrasi biaya kuliah.",
+      "prefix": "K",
+      "dailyQuota": 25,
+      "status": "open",
+      "counterName": "Loket Keuangan",
+      "openHours": "08.00 - 14.00"
+    },
+    {
+      "id": "kemahasiswaan",
+      "name": "Kemahasiswaan",
+      "description": "Beasiswa, organisasi, dan layanan kemahasiswaan.",
+      "prefix": "M",
+      "dailyQuota": 20,
+      "status": "closed",
+      "counterName": "Loket Kemahasiswaan",
+      "openHours": "09.00 - 15.00"
+    }
+  ],
+  "counters": [],
+  "queues": []
+}

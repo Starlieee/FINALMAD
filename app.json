@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Campus Queue",
+    "slug": "campus-queue",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F5F7FB"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F5F7FB"
+      },
+      "package": "com.anonymous.campusqueue"
+    },
+    "plugins": ["./plugins/withLocalApiCleartext"]
+  }
+}
