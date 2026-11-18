@@ -1,23 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, StatusBar, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { api } from './src/api';
-import { Button, Card, ErrorMessage, Icon, PageTitle, Row, Screen } from './src/components';
+import { Button, Card, Icon, PageTitle, Row, Screen } from './src/components';
+import LoginScreen from './src/screens/LoginScreen';
 import StaffControlScreen from './src/screens/StaffControlScreen';
 import { HistoryScreen, HomeScreen, MyQueueScreen, TakeQueueScreen } from './src/screens/UserScreens';
 import { ManageScreen, StatsScreen } from './src/screens/AdminScreens';
@@ -31,100 +20,6 @@ const roleLabels = {
   petugas: 'Petugas loket',
   admin: 'Administrator',
 };
-
-const demoAccounts = [
-  { role: 'Mahasiswa', email: 'user@kampus.id', password: 'user123' },
-  { role: 'Petugas', email: 'petugas@kampus.id', password: 'staff123' },
-  { role: 'Admin', email: 'admin@kampus.id', password: 'admin123' },
-];
-
-function LoginScreen({ onLogin, startupError }) {
-  const insets = useSafeAreaInsets();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(startupError || '');
-  const [loading, setLoading] = useState(false);
-
-  async function submit() {
-    if (!email.trim() || !password) {
-      setError('Masukkan email dan password terlebih dahulu.');
-      return;
-    }
-    setError('');
-    setLoading(true);
-    try {
-      await onLogin(email.trim(), password);
-    } catch (loginError) {
-      setError(loginError.message);
-      setLoading(false);
-    }
-  }
-
-  return (
-    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView
-        style={styles.loginScreen}
-        contentContainerStyle={[styles.loginContent, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 24 }]}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.brandRow}>
-          <View style={styles.brandMark}><Text style={styles.brandMarkText}>CQ</Text></View>
-          <Text style={styles.brandName}>Campus Queue</Text>
-        </View>
-        <Text style={styles.loginTitle}>Antre digital.</Text>
-        <Text style={styles.loginSubtitle}>Ambil nomor, pantau giliran, dan datang tepat waktu ke loket layanan kampus.</Text>
-
-        <View style={styles.form}>
-          <Text style={styles.fieldLabel}>Email</Text>
-          <TextInput
-            accessibilityLabel="Email"
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            onChangeText={setEmail}
-            placeholder="nama@kampus.id"
-            placeholderTextColor={theme.colors.faint}
-            style={styles.input}
-            value={email}
-          />
-          <Text style={[styles.fieldLabel, styles.passwordLabel]}>Password</Text>
-          <View style={styles.passwordWrap}>
-            <TextInput
-              accessibilityLabel="Password"
-              autoCapitalize="none"
-              onChangeText={setPassword}
-              onSubmitEditing={submit}
-              placeholder="Masukkan password"
-              placeholderTextColor={theme.colors.faint}
-              secureTextEntry={!showPassword}
-              style={[styles.input, styles.passwordInput]}
-              value={password}
-            />
-            <Pressable onPress={() => setShowPassword((value) => !value)} style={styles.eye} hitSlop={8} accessibilityLabel="Tampilkan password">
-              <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={theme.colors.muted} />
-            </Pressable>
-          </View>
-          <ErrorMessage message={error} />
-          <Button label="Masuk" loading={loading} onPress={submit} style={styles.loginButton} />
-        </View>
-
-        <Text style={styles.demoTitle}>AKUN DEMO</Text>
-        <View style={styles.demoRow}>
-          {demoAccounts.map((account) => (
-            <Pressable
-              key={account.email}
-              onPress={() => { setEmail(account.email); setPassword(account.password); setError(''); }}
-              style={({ pressed }) => [styles.demoChip, pressed && styles.demoChipPressed]}
-            >
-              <Text style={styles.demoChipText}>{account.role}</Text>
-            </Pressable>
-          ))}
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
-}
 
 function ProfileScreen({ session, onLogout }) {
   const [loggingOut, setLoggingOut] = useState(false);
@@ -280,38 +175,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: theme.colors.background },
   loadingScreen: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background },
-  loginScreen: { flex: 1, backgroundColor: theme.colors.background },
-  loginContent: { flexGrow: 1, paddingHorizontal: 24 },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 48 },
-  brandMark: { width: 36, height: 36, borderRadius: 10, backgroundColor: theme.colors.ink, alignItems: 'center', justifyContent: 'center' },
-  brandMarkText: { color: '#FFFFFF', fontSize: 13, fontWeight: '800', letterSpacing: 0.5 },
-  brandName: { color: theme.colors.text, fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
-  loginTitle: { color: theme.colors.text, fontSize: 40, fontWeight: '700', letterSpacing: -1.6, lineHeight: 46 },
-  loginSubtitle: { color: theme.colors.muted, fontSize: 15, lineHeight: 23, marginTop: 14, maxWidth: 330 },
-  form: { marginTop: 36 },
-  fieldLabel: { color: theme.colors.muted, fontSize: 12, fontWeight: '600', marginBottom: 8 },
-  passwordLabel: { marginTop: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.control,
-    height: 54,
-    color: theme.colors.text,
-    fontSize: 15,
-    paddingHorizontal: 16,
-    backgroundColor: theme.colors.surface,
-  },
-  passwordWrap: { justifyContent: 'center', marginBottom: 18 },
-  passwordInput: { paddingRight: 50 },
-  eye: { position: 'absolute', right: 16 },
-  loginButton: { minHeight: 54 },
-  demoTitle: { color: theme.colors.faint, fontSize: 11, fontWeight: '700', letterSpacing: 1.6, marginTop: 36, marginBottom: 10 },
-  demoRow: { flexDirection: 'row', gap: 8 },
-  demoChip: { flex: 1, alignItems: 'center', paddingVertical: 11, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.border, backgroundColor: theme.colors.surface },
-  demoChipPressed: { backgroundColor: theme.colors.background },
-  demoChipText: { color: theme.colors.text, fontSize: 13, fontWeight: '600' },
   profileCard: { alignItems: 'center', paddingVertical: 28 },
   avatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: theme.colors.ink, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#FFFFFF', fontSize: 28, fontWeight: '700' },

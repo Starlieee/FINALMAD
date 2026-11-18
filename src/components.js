@@ -1,11 +1,24 @@
-import React from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { ActivityIndicator, Animated, Easing, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import theme from './theme';
 
 export function Icon({ name, size = 20, color = theme.colors.text, style }) {
   return <Ionicons name={name} size={size} color={color} style={style} />;
+}
+
+// Isi layar muncul dengan fade dan geser halus saat pertama kali dibuka.
+function FadeIn({ children }) {
+  const value = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(value, { toValue: 1, duration: 420, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+  }, [value]);
+  const style = {
+    opacity: value,
+    transform: [{ translateY: value.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
+  };
+  return <Animated.View style={style}>{children}</Animated.View>;
 }
 
 export function Screen({ children, scroll = false, style, refreshControl }) {
@@ -22,7 +35,7 @@ export function Screen({ children, scroll = false, style, refreshControl }) {
       keyboardShouldPersistTaps="handled"
       refreshControl={refreshControl}
     >
-      {children}
+      <FadeIn>{children}</FadeIn>
     </ScrollView>
   );
 }

@@ -51,7 +51,11 @@ export function HomeScreen({ session, navigation }) {
             <View style={styles.heroDivider} />
             <View style={styles.heroRow}>
               <Text style={styles.heroMeta}>
-                {active.status === 'waiting' ? `${active.aheadCount} orang di depan kamu` : `Silakan ke ${active.counterName}`}
+                {active.status === 'waiting'
+                  ? `${active.aheadCount} orang di depan kamu`
+                  : active.status === 'serving'
+                    ? `Sedang dilayani di ${active.counterName}`
+                    : `Silakan ke ${active.counterName}`}
               </Text>
               <Icon name="arrow-forward" size={18} color="#FFFFFF" />
             </View>
