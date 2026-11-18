@@ -2,6 +2,7 @@ const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const jsonServer = require('json-server');
 const { registerStaffRoutes } = require('./staffRoutes');
+const { registerAppRoutes, ACTIVE_STATUSES } = require('./appRoutes');
 
 const JAKARTA_TIME_ZONE = 'Asia/Jakarta';
 
@@ -30,6 +31,7 @@ function createApp(data = path.join(__dirname, '..', 'db.json')) {
   app.use(jsonServer.defaults());
   app.use(jsonServer.bodyParser);
   registerStaffRoutes({ app, router, serializeWrite, getJakartaDate });
+  registerAppRoutes({ app, router, serializeWrite, getJakartaDate });
 
   app.post('/login', (request, response) => {
     const email = String(request.body.email || '').trim().toLowerCase();
@@ -40,7 +42,7 @@ function createApp(data = path.join(__dirname, '..', 'db.json')) {
       .value();
 
     if (!user) {
-      return response.status(401).json({ error: 'Email atau kata sandi tidak sesuai.' });
+      return response.status(401).json({ error: 'Email atau password salah.' });
     }
 
     const { id, name, role, email: userEmail, studentId, assignedCounter } = user;
@@ -74,19 +76,25 @@ function createApp(data = path.join(__dirname, '..', 'db.json')) {
         const user = router.db.get('users').find({ id: userId }).value();
         const event = router.db.get('events').find({ id: eventId }).value();
 
-        if (!user || user.role !== 'user') {
+        if (!user || !['user', 'admin'].includes(user.role)) {
           return { status: 403, body: { error: 'Akun tidak memiliki akses untuk mengambil antrean.' } };
         }
         if (!event || event.status !== 'open') {
-          return { status: 400, body: { error: 'Layanan tidak tersedia atau sedang tutup.' } };
+          const reason = event && event.status === 'paused' ? 'sedang dijeda' : 'sedang tutup';
+          return { status: 400, body: { error: `Layanan tidak tersedia atau ${reason}.` } };
         }
 
         const date = getJakartaDate();
         const queues = router.db.get('queues');
         const todaysQueues = queues.filter({ eventId, date });
-        const duplicate = todaysQueues.find({ userId }).value();
-        if (duplicate) {
-          return { status: 409, body: { error: 'Anda sudah memiliki antrean untuk layanan ini hari ini.' } };
+        const active = queues
+          .find((queue) => queue.userId === userId && queue.date === date && ACTIVE_STATUSES.includes(queue.status))
+          .value();
+        if (active) {
+          return {
+            status: 409,
+            body: { error: `Anda masih memiliki antrean aktif (${active.ticket}). Selesaikan atau batalkan dulu.`, code: 'ACTIVE_QUEUE' },
+          };
         }
         if (todaysQueues.size().value() >= event.dailyQuota) {
           return { status: 409, body: { error: 'Kuota antrean layanan hari ini sudah habis.' } };

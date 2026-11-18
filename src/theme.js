@@ -1,28 +1,54 @@
 const theme = {
   colors: {
-    primary: '#3157D5',
-    primaryDark: '#2343B2',
-    primarySoft: '#E9EEFF',
-    background: '#F5F7FB',
+    ink: '#101114',
+    primary: '#101114',
+    accent: '#2B4EE6',
+    accentSoft: '#ECEFFD',
+    primarySoft: '#ECEFFD',
+    background: '#F5F4F0',
     surface: '#FFFFFF',
-    text: '#17233C',
-    muted: '#77829A',
-    border: '#E6EAF2',
-    success: '#16845B',
-    successSoft: '#E7F6EF',
-    warning: '#A86411',
-    warningSoft: '#FFF3DE',
-    danger: '#C23B47',
-    dangerSoft: '#FCEBED',
+    surfaceAlt: '#FAF9F6',
+    text: '#101114',
+    muted: '#6E7179',
+    faint: '#A4A6AC',
+    border: '#E6E4DE',
+    success: '#11775A',
+    successSoft: '#E4F3EC',
+    warning: '#9A5B0C',
+    warningSoft: '#FBF0DC',
+    danger: '#B42E3B',
+    dangerSoft: '#FBE9EA',
   },
   radius: {
-    card: 20,
+    card: 22,
     control: 14,
     pill: 999,
   },
   spacing: {
-    screen: 22,
+    screen: 20,
   },
+  shadow: {
+    shadowColor: '#1A1A14',
+    shadowOpacity: 0.06,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2,
+  },
+};
+
+export const statusMeta = {
+  waiting: { label: 'Menunggu', tone: 'neutral' },
+  called: { label: 'Dipanggil', tone: 'warning' },
+  serving: { label: 'Dilayani', tone: 'accent' },
+  completed: { label: 'Selesai', tone: 'success' },
+  skipped: { label: 'Dilewati', tone: 'danger' },
+  cancelled: { label: 'Dibatalkan', tone: 'neutral' },
+};
+
+export const eventStatusMeta = {
+  open: { label: 'Buka', tone: 'success' },
+  paused: { label: 'Jeda', tone: 'warning' },
+  closed: { label: 'Tutup', tone: 'neutral' },
 };
 
 export default theme;

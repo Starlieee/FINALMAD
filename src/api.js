@@ -33,38 +33,31 @@ export const api = {
   getEvents: () => request('/events'),
   takeQueue: (userId, eventId) =>
     request('/take-queue', { method: 'POST', body: JSON.stringify({ userId, eventId }) }),
-  updateQueue: (queueId, status) =>
-    request(`/queues/${encodeURIComponent(queueId)}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status }),
-    }),
-  getStaffPanel: (staffId) =>
-    request(`/staff/panel?staffId=${encodeURIComponent(staffId)}`),
-  callNext: (staffId) =>
-    request('/staff/call-next', { method: 'POST', body: JSON.stringify({ staffId }) }),
-  startStaffQueue: (staffId, queueId) =>
-    request(`/staff/queues/${encodeURIComponent(queueId)}/start`, {
-      method: 'POST',
-      body: JSON.stringify({ staffId }),
-    }),
-  completeStaffQueue: (staffId, queueId) =>
-    request(`/staff/queues/${encodeURIComponent(queueId)}/complete`, {
-      method: 'POST',
-      body: JSON.stringify({ staffId }),
-    }),
-  recallStaffQueue: (staffId, queueId) =>
-    request(`/staff/queues/${encodeURIComponent(queueId)}/recall`, {
-      method: 'POST',
-      body: JSON.stringify({ staffId }),
-    }),
-  skipStaffQueue: (staffId, queueId) =>
-    request(`/staff/queues/${encodeURIComponent(queueId)}/skip`, {
-      method: 'POST',
-      body: JSON.stringify({ staffId }),
-    }),
-  callSkippedQueue: (staffId, queueId) =>
-    request(`/staff/queues/${encodeURIComponent(queueId)}/call-skipped`, {
-      method: 'POST',
-      body: JSON.stringify({ staffId }),
-    }),
+  getMyQueues: (userId) => request(`/my-queues?userId=${encodeURIComponent(userId)}`),
+  cancelQueue: (userId, queueId) =>
+    request(`/queues/${encodeURIComponent(queueId)}/cancel`, { method: 'POST', body: JSON.stringify({ userId }) }),
+  getStats: (adminId) => request(`/admin/stats?adminId=${encodeURIComponent(adminId)}`),
+  createEvent: (adminId, data) =>
+    request('/admin/events', { method: 'POST', body: JSON.stringify({ ...data, adminId }) }),
+  updateEvent: (adminId, eventId, data) =>
+    request(`/admin/events/${encodeURIComponent(eventId)}`, { method: 'PATCH', body: JSON.stringify({ ...data, adminId }) }),
+  getStaff: (adminId) => request(`/admin/staff?adminId=${encodeURIComponent(adminId)}`),
+  createStaff: (adminId, data) =>
+    request('/admin/staff', { method: 'POST', body: JSON.stringify({ ...data, adminId }) }),
+  assignStaff: (adminId, staffId, assignedCounter) =>
+    request(`/admin/staff/${encodeURIComponent(staffId)}`, { method: 'PATCH', body: JSON.stringify({ adminId, assignedCounter }) }),
+  getStaffPanel: (staffId, counterName) =>
+    request(`/staff/panel?staffId=${encodeURIComponent(staffId)}${counterName ? `&counterName=${encodeURIComponent(counterName)}` : ''}`),
+  callNext: (staffId, counterName) =>
+    request('/staff/call-next', { method: 'POST', body: JSON.stringify({ staffId, counterName }) }),
+  startStaffQueue: (staffId, queueId, counterName) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/start`, { method: 'POST', body: JSON.stringify({ staffId, counterName }) }),
+  completeStaffQueue: (staffId, queueId, counterName) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/complete`, { method: 'POST', body: JSON.stringify({ staffId, counterName }) }),
+  recallStaffQueue: (staffId, queueId, counterName) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/recall`, { method: 'POST', body: JSON.stringify({ staffId, counterName }) }),
+  skipStaffQueue: (staffId, queueId, counterName) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/skip`, { method: 'POST', body: JSON.stringify({ staffId, counterName }) }),
+  callSkippedQueue: (staffId, queueId, counterName) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/call-skipped`, { method: 'POST', body: JSON.stringify({ staffId, counterName }) }),
 };

@@ -1,8 +1,13 @@
 function registerStaffRoutes({ app, router, serializeWrite, getJakartaDate }) {
-  function getStaff(staffId) {
+  function getStaff(staffId, counterName) {
     const staff = router.db.get('users').find({ id: String(staffId || '') }).value();
     if (!staff || !['petugas', 'admin'].includes(staff.role)) {
       return { status: 403, body: { error: 'Akun tidak memiliki akses sebagai petugas.' } };
+    }
+    if (staff.role === 'admin') {
+      // Admin dapat bertugas di loket mana pun yang dipilih dari aplikasi.
+      const fallback = router.db.get('events').map('counterName').value()[0] || null;
+      return { staff: { ...staff, assignedCounter: String(counterName || '') || fallback } };
     }
     return { staff };
   }
@@ -35,7 +40,7 @@ function registerStaffRoutes({ app, router, serializeWrite, getJakartaDate }) {
   }
 
   app.get('/staff/panel', (request, response) => {
-    const access = getStaff(request.query.staffId);
+    const access = getStaff(request.query.staffId, request.query.counterName);
     if (!access.staff) return response.status(access.status).json(access.body);
 
     const { staff } = access;
@@ -54,6 +59,7 @@ function registerStaffRoutes({ app, router, serializeWrite, getJakartaDate }) {
 
     return response.json({
       counterName: staff.assignedCounter || null,
+      counters: router.db.get('events').map('counterName').uniq().value(),
       activeQueue,
       waiting,
       skipped,
@@ -64,7 +70,7 @@ function registerStaffRoutes({ app, router, serializeWrite, getJakartaDate }) {
   async function processQueue(request, response, operation) {
     try {
       const result = await serializeWrite(() => {
-        const access = getStaff(request.body.staffId);
+        const access = getStaff(request.body.staffId, request.body.counterName);
         if (!access.staff) return access;
         return operation(access.staff);
       });
