@@ -56,6 +56,28 @@
       "openHours": "09.00 - 15.00"
     }
   ],
-  "counters": [],
-  "queues": []
+  "counters": [
+    {
+      "id": "akademik-2026-11-18",
+      "eventId": "akademik",
+      "date": "2026-11-18",
+      "nextNumber": 2
+    }
+  ],
+  "queues": [
+    {
+      "id": "ae6475cf-209a-4d3f-a131-de761723fd90",
+      "userId": "u-1001",
+      "eventId": "akademik",
+      "date": "2026-11-18",
+      "number": 1,
+      "ticket": "A-001",
+      "status": "completed",
+      "createdAt": "2026-11-17T19:00:15.088Z",
+      "counterName": "Loket Akademik",
+      "calledAt": "2026-11-17T19:01:02.510Z",
+      "servedAt": "2026-11-17T19:01:06.358Z",
+      "completedAt": "2026-11-17T19:01:07.225Z"
+    }
+  ]
 }

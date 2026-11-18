@@ -18,6 +18,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { api } from './src/api';
 import { Badge, Button, Card, ErrorMessage, PageTitle, Screen } from './src/components';
+import StaffControlScreen from './src/screens/StaffControlScreen';
 import theme from './src/theme';
 
 const SESSION_KEY = 'campus-queue-session';
@@ -287,81 +288,6 @@ function TakeQueueScreen({ session }) {
   );
 }
 
-function StaffScreen() {
-  const [summary, setSummary] = useState(null);
-  const [queues, setQueues] = useState([]);
-  const [error, setError] = useState('');
-  const [updating, setUpdating] = useState('');
-
-  async function loadData() {
-    setError('');
-    try {
-      const [nextSummary, allQueues] = await Promise.all([api.getSummary(), api.getQueues()]);
-      setSummary(nextSummary);
-      setQueues(allQueues.filter((queue) => queue.date === nextSummary.date && queue.status === 'waiting'));
-    } catch (loadError) {
-      setError(loadError.message);
-    }
-  }
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function callNext(queue) {
-    setUpdating(queue.id);
-    setError('');
-    try {
-      await api.updateQueue(queue.id, 'called');
-      await loadData();
-    } catch (updateError) {
-      setError(updateError.message);
-    } finally {
-      setUpdating('');
-    }
-  }
-
-  return (
-    <Screen scroll>
-      <PageTitle eyebrow="PANEL PETUGAS" title="Antrean hari ini" subtitle="Panggil antrean berikutnya dari daftar tunggu." />
-      <ErrorMessage message={error} onRetry={loadData} />
-      {summary?.events.map((event) => {
-        const eventQueues = queues.filter((queue) => queue.eventId === event.id);
-        return (
-          <View key={event.id} style={styles.staffGroup}>
-            <View style={styles.sectionHeadingRow}>
-              <View>
-                <Text style={styles.sectionTitle}>{event.counterName}</Text>
-                <Text style={styles.groupSubtitle}>{event.name} · {eventQueues.length} menunggu</Text>
-              </View>
-              <Badge label={event.status === 'open' ? 'BUKA' : 'TUTUP'} tone={event.status === 'open' ? 'success' : 'warning'} />
-            </View>
-            {eventQueues.length === 0 ? (
-              <Card><Text style={styles.emptyText}>Belum ada antrean yang menunggu.</Text></Card>
-            ) : eventQueues.map((queue) => (
-              <Card key={queue.id} style={styles.staffQueueCard}>
-                <View style={styles.staffQueueInfo}>
-                  <Text style={styles.ticketNumberSmall}>{queue.ticket}</Text>
-                  <Text style={styles.myQueueMeta}>Masuk {new Date(queue.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</Text>
-                </View>
-                <Pressable
-                  accessibilityRole="button"
-                  disabled={Boolean(updating)}
-                  onPress={() => callNext(queue)}
-                  style={[styles.callButton, Boolean(updating) && styles.dimmed]}
-                >
-                  {updating === queue.id ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.callButtonText}>Panggil</Text>}
-                </Pressable>
-              </Card>
-            ))}
-          </View>
-        );
-      })}
-      {!summary && !error ? <ActivityIndicator color={theme.colors.primary} style={styles.loader} /> : null}
-    </Screen>
-  );
-}
-
 function AdminScreen() {
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState('');
@@ -476,7 +402,7 @@ function RoleTabs({ session, onLogout }) {
     session.role === 'petugas'
       ? [
           { name: 'Beranda', title: 'Beranda', icon: '⌂', component: HomeScreen, props: { session } },
-          { name: 'Panggilan', title: 'Antrean', icon: '≋', component: StaffScreen, props: {} },
+          { name: 'Kontrol Antrean', title: 'Kontrol Antrean', icon: '≋', component: StaffControlScreen, props: { session } },
         ]
       : session.role === 'admin'
         ? [
@@ -611,13 +537,6 @@ const styles = StyleSheet.create({
   ticketDivider: { width: '100%', borderTopWidth: 1, borderColor: theme.colors.border, borderStyle: 'dashed', marginVertical: 20 },
   ticketStatus: { color: theme.colors.muted, fontSize: 12, lineHeight: 18, textAlign: 'center' },
   modalButton: { width: '100%', marginTop: 21 },
-  staffGroup: { marginBottom: 12 },
-  groupSubtitle: { color: theme.colors.muted, fontSize: 11, marginTop: -7, marginBottom: 2 },
-  staffQueueCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14 },
-  staffQueueInfo: { flex: 1 },
-  callButton: { backgroundColor: theme.colors.primary, borderRadius: 11, minWidth: 82, minHeight: 40, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
-  callButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800' },
-  dimmed: { opacity: 0.65 },
   adminSummary: { backgroundColor: theme.colors.text, borderColor: theme.colors.text, padding: 22 },
   adminLabel: { color: '#C5CEE2', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   adminTotal: { color: '#FFFFFF', fontSize: 42, fontWeight: '900', marginTop: 8 },

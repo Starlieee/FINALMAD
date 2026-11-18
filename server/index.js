@@ -1,6 +1,7 @@
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const jsonServer = require('json-server');
+const { registerStaffRoutes } = require('./staffRoutes');
 
 const JAKARTA_TIME_ZONE = 'Asia/Jakarta';
 
@@ -28,6 +29,7 @@ function createApp(data = path.join(__dirname, '..', 'db.json')) {
 
   app.use(jsonServer.defaults());
   app.use(jsonServer.bodyParser);
+  registerStaffRoutes({ app, router, serializeWrite, getJakartaDate });
 
   app.post('/login', (request, response) => {
     const email = String(request.body.email || '').trim().toLowerCase();

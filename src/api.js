@@ -38,4 +38,33 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     }),
+  getStaffPanel: (staffId) =>
+    request(`/staff/panel?staffId=${encodeURIComponent(staffId)}`),
+  callNext: (staffId) =>
+    request('/staff/call-next', { method: 'POST', body: JSON.stringify({ staffId }) }),
+  startStaffQueue: (staffId, queueId) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/start`, {
+      method: 'POST',
+      body: JSON.stringify({ staffId }),
+    }),
+  completeStaffQueue: (staffId, queueId) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/complete`, {
+      method: 'POST',
+      body: JSON.stringify({ staffId }),
+    }),
+  recallStaffQueue: (staffId, queueId) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/recall`, {
+      method: 'POST',
+      body: JSON.stringify({ staffId }),
+    }),
+  skipStaffQueue: (staffId, queueId) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/skip`, {
+      method: 'POST',
+      body: JSON.stringify({ staffId }),
+    }),
+  callSkippedQueue: (staffId, queueId) =>
+    request(`/staff/queues/${encodeURIComponent(queueId)}/call-skipped`, {
+      method: 'POST',
+      body: JSON.stringify({ staffId }),
+    }),
 };
